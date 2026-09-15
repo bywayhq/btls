@@ -1,4 +1,4 @@
-From 2e39daa2e777ab7d5a9d65c0a6ff3d6770089933 Mon Sep 17 00:00:00 2001
+From 7087e333b127c01a7c8b97684cba508daf5cf749 Mon Sep 17 00:00:00 2001
 From: gngpp <gngppz@gmail.com>
 Date: Fri, 14 Aug 2026 17:03:47 +0800
 Subject: [PATCH 10/11] boringssl: retain benchmark format checks

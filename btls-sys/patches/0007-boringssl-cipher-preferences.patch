@@ -1,4 +1,4 @@
-From 5fabfd69d5ccb0a298adc9cd0bdb146ce4819636 Mon Sep 17 00:00:00 2001
+From 48db5e8f8163a8a4a4f34329301fb90d63a81dde Mon Sep 17 00:00:00 2001
 From: gngpp <gngppz@gmail.com>
 Date: Fri, 14 Aug 2026 17:03:44 +0800
 Subject: [PATCH 07/11] boringssl: add cipher preference controls
@@ -25,10 +25,10 @@ limitations under the License.
  5 files changed, 250 insertions(+), 31 deletions(-)
 
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index d6c0f0e9d..ddabba348 100644
+index 4e5016618..610b30552 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
-@@ -5622,6 +5622,41 @@ OPENSSL_EXPORT int SSL_set_record_size_limit(SSL *ssl, uint16_t limit);
+@@ -5624,6 +5624,41 @@ OPENSSL_EXPORT int SSL_set_record_size_limit(SSL *ssl, uint16_t limit);
  // when the handshake begins.
  OPENSSL_EXPORT int SSL_CTX_set_record_size_limit(SSL_CTX *ctx, uint16_t limit);
  
@@ -70,7 +70,7 @@ index d6c0f0e9d..ddabba348 100644
  // SSL_max_seal_overhead returns the maximum overhead, in bytes, of sealing a
  // record with `ssl`.
  OPENSSL_EXPORT size_t SSL_max_seal_overhead(const SSL *ssl);
-@@ -6934,7 +6969,6 @@ OPENSSL_EXPORT void SSL_CTX_set_aes_hw_override_for_testing(
+@@ -6936,7 +6971,6 @@ OPENSSL_EXPORT void SSL_CTX_set_aes_hw_override_for_testing(
  // `SSL_CTX_set_aes_override_for_testing` but only configures a single `SSL*`.
  OPENSSL_EXPORT void SSL_set_aes_hw_override_for_testing(SSL *ssl,
                                                          bool override_value);

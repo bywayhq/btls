@@ -1,4 +1,4 @@
-From 25929a22789c766fdcff9b273f7022ff748d0ef4 Mon Sep 17 00:00:00 2001
+From 64ef5a93b96d635efde398f36776cdf8a1d50c70 Mon Sep 17 00:00:00 2001
 From: gngpp <gngppz@gmail.com>
 Date: Fri, 14 Aug 2026 17:03:45 +0800
 Subject: [PATCH 08/11] boringssl: allow duplicate signature algorithms
@@ -22,10 +22,10 @@ limitations under the License.
  2 files changed, 16 insertions(+), 24 deletions(-)
 
 diff --git a/ssl/ssl_privkey.cc b/ssl/ssl_privkey.cc
-index 483a4445a..9174fef4d 100644
+index f2ab17e68..147cfcb80 100644
 --- a/ssl/ssl_privkey.cc
 +++ b/ssl/ssl_privkey.cc
-@@ -582,24 +582,9 @@ int SSL_is_signature_algorithm_rsa_pss(uint16_t sigalg) {
+@@ -591,24 +591,9 @@ int SSL_is_signature_algorithm_rsa_pss(uint16_t sigalg) {
    return alg != nullptr && alg->is_rsa_pss;
  }
  
@@ -54,10 +54,10 @@ index 483a4445a..9174fef4d 100644
  }
  
 diff --git a/ssl/ssl_test.cc b/ssl/ssl_test.cc
-index 6a59effee..6606390c9 100644
+index 52f2d2ddb..3bf56d91d 100644
 --- a/ssl/ssl_test.cc
 +++ b/ssl/ssl_test.cc
-@@ -7430,7 +7430,9 @@ TEST(SSLTest, SigAlgs) {
+@@ -7438,7 +7438,9 @@ TEST(SSLTest, SigAlgs) {
        {{1}, false, {}},
        {{1, 2, 3}, false, {}},
        {{NID_sha256, EVP_PKEY_ED25519}, false, {}},
@@ -68,7 +68,7 @@ index 6a59effee..6606390c9 100644
        {{NID_sha256, EVP_PKEY_ML_DSA_44}, false, {}},
  
        {{NID_sha256, EVP_PKEY_RSA}, true, {SSL_SIGN_RSA_PKCS1_SHA256}},
-@@ -7485,8 +7487,13 @@ TEST(SSLTest, SigAlgsList) {
+@@ -7493,8 +7495,13 @@ TEST(SSLTest, SigAlgsList) {
        {":RSA+SHA256+:", false, {}},
        {"!", false, {}},
        {"\x01", false, {}},
@@ -84,7 +84,7 @@ index 6a59effee..6606390c9 100644
  
        {"RSA+SHA256", true, {SSL_SIGN_RSA_PKCS1_SHA256}},
        {"RSA+SHA256:ed25519",
-@@ -11318,10 +11325,10 @@ TEST(SSLTest, InvalidSignatureAlgorithm) {
+@@ -11326,10 +11333,10 @@ TEST(SSLTest, InvalidSignatureAlgorithm) {
  
    static const uint16_t kDuplicatePrefs[] = {SSL_SIGN_RSA_PKCS1_SHA256,
                                               SSL_SIGN_RSA_PKCS1_SHA256};

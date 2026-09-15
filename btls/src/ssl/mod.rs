@@ -2120,12 +2120,13 @@ impl SslContextBuilder {
         }
     }
 
-    /// Sets the TLS 1.3 signature algorithms accepted for server delegated
+    /// Sets the ordered signature algorithms advertised for server delegated
     /// credentials.
     ///
-    /// RSAE and pre-TLS 1.3 algorithms are rejected. Delegated credentials are
-    /// unavailable with the buffer-only TLS method because their authorization
-    /// requires the leaf X.509 certificate.
+    /// `ecdsa_sha1` is accepted to reproduce browser wire images, but remains
+    /// invalid if selected for TLS 1.3. RSAE algorithms are rejected. Delegated
+    /// credentials are unavailable with the buffer-only TLS method because
+    /// their authorization requires the leaf X.509 certificate.
     #[cfg(not(feature = "fips"))]
     #[corresponds(SSL_CTX_set_delegated_credentials)]
     pub fn set_delegated_credentials(&mut self, sigalgs: &str) -> Result<(), ErrorStack> {

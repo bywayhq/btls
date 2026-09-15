@@ -1,7 +1,7 @@
 From eb8bf52677a2ab18eda63f82f2e78f4cd3465d4d Mon Sep 17 00:00:00 2001
 From: gngpp <gngppz@gmail.com>
 Date: Fri, 14 Aug 2026 17:03:41 +0800
-Subject: [PATCH 04/10] boringssl: add extension ordering controls
+Subject: [PATCH 04/11] boringssl: add extension ordering controls
 
 Copyright (c) 2025-2026 0x676e67 <gngppz@gmail.com>
 

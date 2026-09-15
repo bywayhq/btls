@@ -2120,7 +2120,12 @@ impl SslContextBuilder {
         }
     }
 
-    /// Sets whether the context should enable delegated credentials.
+    /// Sets the TLS 1.3 signature algorithms accepted for server delegated
+    /// credentials.
+    ///
+    /// RSAE and pre-TLS 1.3 algorithms are rejected. Delegated credentials are
+    /// unavailable with the buffer-only TLS method because their authorization
+    /// requires the leaf X.509 certificate.
     #[cfg(not(feature = "fips"))]
     #[corresponds(SSL_CTX_set_delegated_credentials)]
     pub fn set_delegated_credentials(&mut self, sigalgs: &str) -> Result<(), ErrorStack> {

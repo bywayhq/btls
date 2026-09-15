@@ -1,7 +1,7 @@
-From 837623ae7cc267f4d23869ca8db59af8a909d988 Mon Sep 17 00:00:00 2001
+From 25929a22789c766fdcff9b273f7022ff748d0ef4 Mon Sep 17 00:00:00 2001
 From: gngpp <gngppz@gmail.com>
 Date: Fri, 14 Aug 2026 17:03:45 +0800
-Subject: [PATCH 08/10] boringssl: allow duplicate signature algorithms
+Subject: [PATCH 08/11] boringssl: allow duplicate signature algorithms
 
 Copyright (c) 2025-2026 0x676e67 <gngppz@gmail.com>
 
@@ -22,10 +22,10 @@ limitations under the License.
  2 files changed, 16 insertions(+), 24 deletions(-)
 
 diff --git a/ssl/ssl_privkey.cc b/ssl/ssl_privkey.cc
-index 2e04fa4a5..af40dd514 100644
+index 483a4445a..9174fef4d 100644
 --- a/ssl/ssl_privkey.cc
 +++ b/ssl/ssl_privkey.cc
-@@ -573,24 +573,9 @@ int SSL_is_signature_algorithm_rsa_pss(uint16_t sigalg) {
+@@ -582,24 +582,9 @@ int SSL_is_signature_algorithm_rsa_pss(uint16_t sigalg) {
    return alg != nullptr && alg->is_rsa_pss;
  }
  
@@ -54,10 +54,10 @@ index 2e04fa4a5..af40dd514 100644
  }
  
 diff --git a/ssl/ssl_test.cc b/ssl/ssl_test.cc
-index 7f35da040..4d0f3252c 100644
+index 6a59effee..6606390c9 100644
 --- a/ssl/ssl_test.cc
 +++ b/ssl/ssl_test.cc
-@@ -7063,7 +7063,9 @@ TEST(SSLTest, SigAlgs) {
+@@ -7430,7 +7430,9 @@ TEST(SSLTest, SigAlgs) {
        {{1}, false, {}},
        {{1, 2, 3}, false, {}},
        {{NID_sha256, EVP_PKEY_ED25519}, false, {}},
@@ -68,7 +68,7 @@ index 7f35da040..4d0f3252c 100644
        {{NID_sha256, EVP_PKEY_ML_DSA_44}, false, {}},
  
        {{NID_sha256, EVP_PKEY_RSA}, true, {SSL_SIGN_RSA_PKCS1_SHA256}},
-@@ -7118,8 +7120,13 @@ TEST(SSLTest, SigAlgsList) {
+@@ -7485,8 +7487,13 @@ TEST(SSLTest, SigAlgsList) {
        {":RSA+SHA256+:", false, {}},
        {"!", false, {}},
        {"\x01", false, {}},
@@ -84,7 +84,7 @@ index 7f35da040..4d0f3252c 100644
  
        {"RSA+SHA256", true, {SSL_SIGN_RSA_PKCS1_SHA256}},
        {"RSA+SHA256:ed25519",
-@@ -10951,10 +10958,10 @@ TEST(SSLTest, InvalidSignatureAlgorithm) {
+@@ -11318,10 +11325,10 @@ TEST(SSLTest, InvalidSignatureAlgorithm) {
  
    static const uint16_t kDuplicatePrefs[] = {SSL_SIGN_RSA_PKCS1_SHA256,
                                               SSL_SIGN_RSA_PKCS1_SHA256};
@@ -98,3 +98,5 @@ index 7f35da040..4d0f3252c 100644
  }
  
  TEST(SSLTest, InvalidGroups) {
+-- 
+2.50.0

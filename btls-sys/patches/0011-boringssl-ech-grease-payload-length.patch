@@ -1,8 +1,20 @@
+From c71fed23e452020b5cfb0c7caf802b0bd6fbfb59 Mon Sep 17 00:00:00 2001
+From: ARYA <AryaAlikhani@icloud.com>
+Date: Tue, 15 Sep 2026 15:00:04 -0700
+Subject: [PATCH 11/11] boringssl: preserve ECH GREASE payload length
+
+---
+ include/openssl/ssl.h         |  7 +++++
+ ssl/encrypted_client_hello.cc | 33 +++++++++++++++++++--
+ ssl/internal.h                |  5 ++++
+ ssl/ssl_test.cc               | 54 +++++++++++++++++++++++++++++++++++
+ 4 files changed, 97 insertions(+), 2 deletions(-)
+
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index 56682da6a..63f5816db 100644
+index ddabba348..fda76bf87 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
-@@ -4598,6 +4598,13 @@ OPENSSL_EXPORT const char *SSL_early_data_reason_string(
+@@ -4639,6 +4639,13 @@ OPENSSL_EXPORT const char *SSL_early_data_reason_string(
  // ECH extension when no supported ECHConfig is available.
  OPENSSL_EXPORT void SSL_set_enable_ech_grease(SSL *ssl, int enable);
  
@@ -75,10 +87,10 @@ index 46ba196f1..27f161255 100644
                               size_t ech_config_list_len) {
    auto *ssl_impl = FromOpaque(ssl);
 diff --git a/ssl/internal.h b/ssl/internal.h
-index 74c6c2e9c..3d7c9b2f4 100644
+index 0f9c8a040..b7096c768 100644
 --- a/ssl/internal.h
 +++ b/ssl/internal.h
-@@ -3504,6 +3504,11 @@ struct SSL_CONFIG {
+@@ -3577,6 +3577,11 @@ struct SSL_CONFIG {
    // ClientHello.
    bool ech_grease_enabled : 1;
  
@@ -91,10 +103,10 @@ index 74c6c2e9c..3d7c9b2f4 100644
    bool signed_cert_timestamps_enabled : 1;
  
 diff --git a/ssl/ssl_test.cc b/ssl/ssl_test.cc
-index 03b67f1ed..d7402d9f7 100644
+index 6606390c9..0af785b0e 100644
 --- a/ssl/ssl_test.cc
 +++ b/ssl/ssl_test.cc
-@@ -2810,6 +2810,60 @@ static bool GetECHLength(SSL_CTX *ctx, size_t *out_client_hello_len,
+@@ -3176,6 +3176,60 @@ static bool GetECHLength(SSL_CTX *ctx, size_t *out_client_hello_len,
    return true;
  }
  
@@ -155,3 +167,5 @@ index 03b67f1ed..d7402d9f7 100644
  TEST(SSLTest, ECHPadding) {
    bssl::UniquePtr<SSL_CTX> ctx(SSL_CTX_new(TLS_method()));
    ASSERT_TRUE(ctx);
+-- 
+2.50.0

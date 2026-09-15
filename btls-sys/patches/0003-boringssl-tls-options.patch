@@ -1,7 +1,7 @@
 From c40c54b4581767db035d6114ae59b4bd8ca3d78a Mon Sep 17 00:00:00 2001
 From: gngpp <gngppz@gmail.com>
 Date: Fri, 14 Aug 2026 17:03:40 +0800
-Subject: [PATCH 03/10] boringssl: add TLS compatibility options
+Subject: [PATCH 03/11] boringssl: add TLS compatibility options
 
 Copyright (c) 2025-2026 0x676e67 <gngppz@gmail.com>
 

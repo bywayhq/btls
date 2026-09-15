@@ -1,7 +1,7 @@
 From a78c6cde05084b32bc59af0fe9598740f9877f00 Mon Sep 17 00:00:00 2001
 From: ARYA <AryaAlikhani@icloud.com>
 Date: Tue, 15 Sep 2026 13:57:44 -0700
-Subject: [PATCH 05/10] boringssl: implement RFC 8449 record size limits
+Subject: [PATCH 05/11] boringssl: implement RFC 8449 record size limits
 
 Negotiate directional TLS record limits, stage them by traffic-key epoch,
 fragment protected records, enforce inbound bounds, and decline unsupported

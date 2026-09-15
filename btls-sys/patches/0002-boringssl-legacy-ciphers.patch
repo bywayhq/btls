@@ -1,7 +1,7 @@
 From 74613c81583c31d721aa9e2072c0169737846fe2 Mon Sep 17 00:00:00 2001
 From: gngpp <gngppz@gmail.com>
 Date: Fri, 14 Aug 2026 17:03:39 +0800
-Subject: [PATCH 02/10] boringssl: restore legacy cipher suites
+Subject: [PATCH 02/11] boringssl: restore legacy cipher suites
 
 Copyright (c) 2025-2026 0x676e67 <gngppz@gmail.com>
 

@@ -1,7 +1,7 @@
 From 3fab509b5e3922d30f758efffeb7088bea5071b2 Mon Sep 17 00:00:00 2001
 From: gngpp <gngppz@gmail.com>
 Date: Fri, 14 Aug 2026 17:03:38 +0800
-Subject: [PATCH 01/10] boringssl: add FFDHE groups
+Subject: [PATCH 01/11] boringssl: add FFDHE groups
 
 Copyright (c) 2025-2026 0x676e67 <gngppz@gmail.com>
 

@@ -1,7 +1,7 @@
-From e3a5f9482d149bfe02509687b6fb9fa133ba0aea Mon Sep 17 00:00:00 2001
+From 8bd4c45fd7d4929009411447f0675ba2efec671c Mon Sep 17 00:00:00 2001
 From: gngpp <gngppz@gmail.com>
 Date: Fri, 14 Aug 2026 17:03:46 +0800
-Subject: [PATCH 09/10] boringssl: export Zstd certificate compression
+Subject: [PATCH 09/11] boringssl: export Zstd certificate compression
 
 Copyright (c) 2025-2026 0x676e67 <gngppz@gmail.com>
 
@@ -21,13 +21,16 @@ limitations under the License.
  1 file changed, 1 insertion(+)
 
 diff --git a/include/openssl/tls1.h b/include/openssl/tls1.h
-index 611b202e1..66484b786 100644
+index 49ccf29c2..1e51f95e8 100644
 --- a/include/openssl/tls1.h
 +++ b/include/openssl/tls1.h
-@@ -177,5 +177,6 @@ extern "C" {
+@@ -177,6 +177,7 @@ extern "C" {
  // From https://www.rfc-editor.org/rfc/rfc8879.html#section-3
  #define TLSEXT_cert_compression_zlib 1
  #define TLSEXT_cert_compression_brotli 2
 +#define TLSEXT_cert_compression_zstd 3
  
  #define TLSEXT_MAXLEN_host_name 255
+ 
+-- 
+2.50.0

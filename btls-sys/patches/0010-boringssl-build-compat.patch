@@ -1,7 +1,7 @@
-From f1eb0ff4dd8d15a4f47839a1e7059a501f3f6a74 Mon Sep 17 00:00:00 2001
+From 2e39daa2e777ab7d5a9d65c0a6ff3d6770089933 Mon Sep 17 00:00:00 2001
 From: gngpp <gngppz@gmail.com>
 Date: Fri, 14 Aug 2026 17:03:47 +0800
-Subject: [PATCH 10/10] boringssl: retain benchmark format checks
+Subject: [PATCH 10/11] boringssl: retain benchmark format checks
 
 Copyright (c) 2025-2026 0x676e67 <gngppz@gmail.com>
 
@@ -32,3 +32,5 @@ index 9c5df3ba2..395cdc2f4 100644
  std::string StrFormat(const char* format, ...) {
    va_list args;
    va_start(args, format);
+-- 
+2.50.0

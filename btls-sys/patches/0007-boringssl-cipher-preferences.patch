@@ -1,7 +1,7 @@
-From ef6c386927d17b0f2c40efd7b53d2429ef79e47d Mon Sep 17 00:00:00 2001
+From 5fabfd69d5ccb0a298adc9cd0bdb146ce4819636 Mon Sep 17 00:00:00 2001
 From: gngpp <gngppz@gmail.com>
 Date: Fri, 14 Aug 2026 17:03:44 +0800
-Subject: [PATCH 07/10] boringssl: add cipher preference controls
+Subject: [PATCH 07/11] boringssl: add cipher preference controls
 
 Copyright (c) 2025-2026 0x676e67 <gngppz@gmail.com>
 
@@ -25,10 +25,10 @@ limitations under the License.
  5 files changed, 250 insertions(+), 31 deletions(-)
 
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index 85efc6c7b..d88d6c761 100644
+index d6c0f0e9d..ddabba348 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
-@@ -5621,6 +5621,41 @@ OPENSSL_EXPORT int SSL_set_record_size_limit(SSL *ssl, uint16_t limit);
+@@ -5622,6 +5622,41 @@ OPENSSL_EXPORT int SSL_set_record_size_limit(SSL *ssl, uint16_t limit);
  // when the handshake begins.
  OPENSSL_EXPORT int SSL_CTX_set_record_size_limit(SSL_CTX *ctx, uint16_t limit);
  
@@ -70,7 +70,7 @@ index 85efc6c7b..d88d6c761 100644
  // SSL_max_seal_overhead returns the maximum overhead, in bytes, of sealing a
  // record with `ssl`.
  OPENSSL_EXPORT size_t SSL_max_seal_overhead(const SSL *ssl);
-@@ -6933,7 +6968,6 @@ OPENSSL_EXPORT void SSL_CTX_set_aes_hw_override_for_testing(
+@@ -6934,7 +6969,6 @@ OPENSSL_EXPORT void SSL_CTX_set_aes_hw_override_for_testing(
  // `SSL_CTX_set_aes_override_for_testing` but only configures a single `SSL*`.
  OPENSSL_EXPORT void SSL_set_aes_hw_override_for_testing(SSL *ssl,
                                                          bool override_value);
@@ -165,7 +165,7 @@ index a77f3e9aa..04506f7fb 100644
      }
    }
 diff --git a/ssl/internal.h b/ssl/internal.h
-index d19d3d861..10e55bcbc 100644
+index 2762b6f5d..0f9c8a040 100644
 --- a/ssl/internal.h
 +++ b/ssl/internal.h
 @@ -333,6 +333,12 @@ bool ssl_create_cipher_list(UniquePtr<SSLCipherPreferenceList> *out_cipher_list,
@@ -181,7 +181,7 @@ index d19d3d861..10e55bcbc 100644
  // ssl_cipher_auth_mask_for_key returns the mask of cipher `algorithm_auth`
  // values suitable for use with `key` in TLS 1.2 and below. `sign_ok` indicates
  // whether `key` may be used for signing.
-@@ -3426,6 +3432,10 @@ struct SSL_CONFIG {
+@@ -3449,6 +3455,10 @@ struct SSL_CONFIG {
    // crypto
    UniquePtr<SSLCipherPreferenceList> cipher_list;
  
@@ -192,7 +192,7 @@ index d19d3d861..10e55bcbc 100644
    // This is used to hold the local certificate used (i.e. the server
    // certificate for a server or the client certificate for a client).
    UniquePtr<CERT> cert;
-@@ -3607,6 +3617,11 @@ struct SSL_CONFIG {
+@@ -3630,6 +3640,11 @@ struct SSL_CONFIG {
    // supported by the client.
    Array<uint16_t> delegated_credentials;
  
@@ -204,7 +204,7 @@ index d19d3d861..10e55bcbc 100644
    // server_padding_enabled is true iff the server is willing to send additional
    // padding to clients that request it through the server padding extension.
    bool server_padding_enabled : 1;
-@@ -4290,6 +4305,14 @@ class SSLContext : public ssl_ctx_st, public RefCounted<SSLContext> {
+@@ -4313,6 +4328,14 @@ class SSLContext : public ssl_ctx_st, public RefCounted<SSLContext> {
    // SSL_CTX_set_extension_order. An empty array leaves the order unset.
    bssl::Array<uint16_t> extension_order;
  

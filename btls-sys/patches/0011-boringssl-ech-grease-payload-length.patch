@@ -1,5 +1,5 @@
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index 56682da6a..a704a7793 100644
+index 56682da6a..63f5816db 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
 @@ -4598,6 +4598,13 @@ OPENSSL_EXPORT const char *SSL_early_data_reason_string(
@@ -8,8 +8,8 @@ index 56682da6a..a704a7793 100644
  
 +// SSL_set_ech_grease_payload_length configures the exact payload length of a
 +// GREASE ECH extension. This does not enable ECH GREASE. The configured
-+// payload, together with the ECHClientHelloOuter framing, must fit in a TLS
-+// extension body. It returns one on success and zero on error.
++// payload must be non-empty and, together with the ECHClientHelloOuter framing,
++// must fit in a TLS extension body. It returns one on success and zero on error.
 +OPENSSL_EXPORT int SSL_set_ech_grease_payload_length(SSL *ssl,
 +                                                     size_t payload_length);
 +
@@ -17,7 +17,7 @@ index 56682da6a..a704a7793 100644
  // specified configuration. `ech_config_list` should contain a serialized
  // ECHConfigList structure. It returns one on success and zero on error.
 diff --git a/ssl/encrypted_client_hello.cc b/ssl/encrypted_client_hello.cc
-index 46ba196f1..b534f4f33 100644
+index 46ba196f1..27f161255 100644
 --- a/ssl/encrypted_client_hello.cc
 +++ b/ssl/encrypted_client_hello.cc
 @@ -729,6 +729,14 @@ static size_t random_size(size_t min, size_t max) {
@@ -48,13 +48,18 @@ index 46ba196f1..b534f4f33 100644
    bssl::ScopedCBB cbb;
    CBB enc_cbb, payload_cbb;
    uint8_t *payload;
-@@ -901,6 +911,20 @@ void SSL_set_enable_ech_grease(SSL *ssl, int enable) {
+@@ -901,6 +911,25 @@ void SSL_set_enable_ech_grease(SSL *ssl, int enable) {
    ssl_impl->config->ech_grease_enabled = !!enable;
  }
  
 +int SSL_set_ech_grease_payload_length(SSL *ssl, size_t payload_length) {
 +  auto *ssl_impl = FromOpaque(ssl);
 +  if (!ssl_impl->config) {
++    OPENSSL_PUT_ERROR(SSL, ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED);
++    return 0;
++  }
++  if (payload_length == 0) {
++    OPENSSL_PUT_ERROR(SSL, SSL_R_BAD_LENGTH);
 +    return 0;
 +  }
 +  if (payload_length > UINT16_MAX - kEchGreaseExtensionOverhead) {
@@ -86,10 +91,10 @@ index 74c6c2e9c..3d7c9b2f4 100644
    bool signed_cert_timestamps_enabled : 1;
  
 diff --git a/ssl/ssl_test.cc b/ssl/ssl_test.cc
-index 03b67f1ed..e6dd76a9e 100644
+index 03b67f1ed..d7402d9f7 100644
 --- a/ssl/ssl_test.cc
 +++ b/ssl/ssl_test.cc
-@@ -2810,6 +2810,52 @@ static bool GetECHLength(SSL_CTX *ctx, size_t *out_client_hello_len,
+@@ -2810,6 +2810,60 @@ static bool GetECHLength(SSL_CTX *ctx, size_t *out_client_hello_len,
    return true;
  }
  
@@ -133,10 +138,18 @@ index 03b67f1ed..e6dd76a9e 100644
 +  bssl::UniquePtr<SSL_CTX> ctx(SSL_CTX_new(TLS_method()));
 +  bssl::UniquePtr<SSL> ssl(ctx ? SSL_new(ctx.get()) : nullptr);
 +  ASSERT_TRUE(ssl);
++  EXPECT_FALSE(SSL_set_ech_grease_payload_length(ssl.get(), 0));
++  EXPECT_TRUE(ErrorsAreAndClear({{ERR_LIB_SSL, SSL_R_BAD_LENGTH}}));
++
 +  constexpr size_t kECHGreaseExtensionOverheadForTest = 42;
 +  EXPECT_FALSE(SSL_set_ech_grease_payload_length(
 +      ssl.get(), UINT16_MAX - kECHGreaseExtensionOverheadForTest + 1));
-+  ERR_clear_error();
++  EXPECT_TRUE(ErrorsAreAndClear({{ERR_LIB_SSL, ERR_R_OVERFLOW}}));
++
++  FromOpaque(ssl.get())->config.reset();
++  EXPECT_FALSE(SSL_set_ech_grease_payload_length(ssl.get(), 239));
++  EXPECT_TRUE(ErrorsAreAndClear(
++      {{ERR_LIB_SSL, ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED}}));
 +}
 +
  TEST(SSLTest, ECHPadding) {

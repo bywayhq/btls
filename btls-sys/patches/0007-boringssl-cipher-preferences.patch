@@ -1,4 +1,4 @@
-From 3964c65b6c73965532e8c4d55940ab85ce6f1397 Mon Sep 17 00:00:00 2001
+From 3992db054bbfd3bf4ca49ae8c59494ba2cb0989e Mon Sep 17 00:00:00 2001
 From: gngpp <gngppz@gmail.com>
 Date: Fri, 14 Aug 2026 17:03:44 +0800
 Subject: [PATCH 07/10] boringssl: add cipher preference controls
@@ -25,12 +25,12 @@ limitations under the License.
  5 files changed, 250 insertions(+), 31 deletions(-)
 
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
-index 8e7177810..d78663878 100644
+index 417e2451a..804cb4238 100644
 --- a/include/openssl/ssl.h
 +++ b/include/openssl/ssl.h
-@@ -5614,6 +5614,41 @@ OPENSSL_EXPORT void SSL_set_record_size_limit(SSL *ssl, uint16_t limit);
- // send record size limit extension.
- OPENSSL_EXPORT void SSL_CTX_set_record_size_limit(SSL_CTX *ctx, uint16_t limit);
+@@ -5619,6 +5619,41 @@ OPENSSL_EXPORT int SSL_set_record_size_limit(SSL *ssl, uint16_t limit);
+ // handoff connections reject the setting when instantiated.
+ OPENSSL_EXPORT int SSL_CTX_set_record_size_limit(SSL_CTX *ctx, uint16_t limit);
  
 +// SSL_CTX_set_preserve_tls13_cipher_list configures whether sockets on |ctx|
 +// should preserve the TLS 1.3 cipher list order, retaining the original cipher
@@ -70,7 +70,7 @@ index 8e7177810..d78663878 100644
  // SSL_max_seal_overhead returns the maximum overhead, in bytes, of sealing a
  // record with `ssl`.
  OPENSSL_EXPORT size_t SSL_max_seal_overhead(const SSL *ssl);
-@@ -6926,7 +6961,6 @@ OPENSSL_EXPORT void SSL_CTX_set_aes_hw_override_for_testing(
+@@ -6931,7 +6966,6 @@ OPENSSL_EXPORT void SSL_CTX_set_aes_hw_override_for_testing(
  // `SSL_CTX_set_aes_override_for_testing` but only configures a single `SSL*`.
  OPENSSL_EXPORT void SSL_set_aes_hw_override_for_testing(SSL *ssl,
                                                          bool override_value);
@@ -79,7 +79,7 @@ index 8e7177810..d78663878 100644
  
  }  // extern C++
 diff --git a/ssl/handshake_client.cc b/ssl/handshake_client.cc
-index 298f04f9c..f52bff3c0 100644
+index a77f3e9aa..04506f7fb 100644
 --- a/ssl/handshake_client.cc
 +++ b/ssl/handshake_client.cc
 @@ -113,35 +113,52 @@ static bool ssl_write_client_cipher_list(const SSL_HANDSHAKE *hs, CBB *out,
@@ -165,7 +165,7 @@ index 298f04f9c..f52bff3c0 100644
      }
    }
 diff --git a/ssl/internal.h b/ssl/internal.h
-index e9ba4e9b5..20f9dd461 100644
+index c348d4008..a48bd76f7 100644
 --- a/ssl/internal.h
 +++ b/ssl/internal.h
 @@ -333,6 +333,12 @@ bool ssl_create_cipher_list(UniquePtr<SSLCipherPreferenceList> *out_cipher_list,
@@ -181,7 +181,7 @@ index e9ba4e9b5..20f9dd461 100644
  // ssl_cipher_auth_mask_for_key returns the mask of cipher `algorithm_auth`
  // values suitable for use with `key` in TLS 1.2 and below. `sign_ok` indicates
  // whether `key` may be used for signing.
-@@ -3399,6 +3405,10 @@ struct SSL_CONFIG {
+@@ -3420,6 +3426,10 @@ struct SSL_CONFIG {
    // crypto
    UniquePtr<SSLCipherPreferenceList> cipher_list;
  
@@ -192,7 +192,7 @@ index e9ba4e9b5..20f9dd461 100644
    // This is used to hold the local certificate used (i.e. the server
    // certificate for a server or the client certificate for a client).
    UniquePtr<CERT> cert;
-@@ -3579,6 +3589,11 @@ struct SSL_CONFIG {
+@@ -3601,6 +3611,11 @@ struct SSL_CONFIG {
    // supported by the client.
    Array<uint16_t> delegated_credentials;
  
@@ -204,7 +204,7 @@ index e9ba4e9b5..20f9dd461 100644
    // server_padding_enabled is true iff the server is willing to send additional
    // padding to clients that request it through the server padding extension.
    bool server_padding_enabled : 1;
-@@ -4262,6 +4277,14 @@ class SSLContext : public ssl_ctx_st, public RefCounted<SSLContext> {
+@@ -4284,6 +4299,14 @@ class SSLContext : public ssl_ctx_st, public RefCounted<SSLContext> {
    // SSL_CTX_set_extension_order. An empty array leaves the order unset.
    bssl::Array<uint16_t> extension_order;
  
@@ -305,7 +305,7 @@ index d612ddf28..1bc769332 100644
                              const bool has_aes_hw, const char *rule_str,
                              bool strict) {
 diff --git a/ssl/ssl_lib.cc b/ssl/ssl_lib.cc
-index 012022c74..ad3cd0767 100644
+index 672e79bc5..63cc14985 100644
 --- a/ssl/ssl_lib.cc
 +++ b/ssl/ssl_lib.cc
 @@ -401,7 +401,8 @@ bssl::SSLContext::SSLContext(const SSL_METHOD *ssl_method)
@@ -333,15 +333,15 @@ index 012022c74..ad3cd0767 100644
    if (ctx_impl->psk_identity_hint) {
      ssl->config->psk_identity_hint.reset(
          OPENSSL_strdup(ctx_impl->psk_identity_hint.get()));
-@@ -576,6 +585,8 @@ SSL *SSL_new(SSL_CTX *ctx) {
+@@ -575,6 +584,8 @@ SSL *SSL_new(SSL_CTX *ctx) {
+   ssl->config->ocsp_stapling_enabled = ctx_impl->ocsp_stapling_enabled;
    ssl->config->handoff = ctx_impl->handoff;
-   ssl->quic_method = ctx_impl->quic_method;
    ssl->config->record_size_limit = ctx_impl->record_size_limit;
 +  ssl->config->preserve_tls13_cipher_list =
 +      ctx_impl->preserve_tls13_cipher_list;
+   ssl->quic_method = ctx_impl->quic_method;
  
    if (!ssl->method->ssl_new(ssl.get()) ||
-       !ssl->ctx->x509_method->ssl_new(ssl->s3->hs.get())) {
 @@ -599,6 +610,7 @@ SSL_CONFIG::SSL_CONFIG(SSLImpl *ssl_arg)
        permute_extensions(false),
        disable_second_keyshare(false),
@@ -398,8 +398,8 @@ index 012022c74..ad3cd0767 100644
    return ssl_create_cipher_list(&ssl_impl->config->cipher_list, has_aes_hw, str,
                                  true /* strict */);
  }
-@@ -2331,6 +2363,45 @@ void SSL_CTX_set_record_size_limit(SSL_CTX *ctx, uint16_t limit) {
-   FromOpaque(ctx)->record_size_limit = limit;
+@@ -2356,6 +2388,45 @@ int SSL_CTX_set_record_size_limit(SSL_CTX *ctx, uint16_t limit) {
+   return 1;
  }
  
 +void SSL_CTX_set_preserve_tls13_cipher_list(SSL_CTX *ctx,
@@ -444,3 +444,5 @@ index 012022c74..ad3cd0767 100644
  void SSL_get0_signed_cert_timestamp_list(const SSL *ssl, const uint8_t **out,
                                           size_t *out_len) {
    SSL_SESSION *session = SSL_get_session(ssl);
+-- 
+2.50.0

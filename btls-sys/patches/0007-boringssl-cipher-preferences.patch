@@ -1,4 +1,4 @@
-From ece1800da6780f78f0e84608590e174638811e53 Mon Sep 17 00:00:00 2001
+From ef6c386927d17b0f2c40efd7b53d2429ef79e47d Mon Sep 17 00:00:00 2001
 From: gngpp <gngppz@gmail.com>
 Date: Fri, 14 Aug 2026 17:03:44 +0800
 Subject: [PATCH 07/10] boringssl: add cipher preference controls

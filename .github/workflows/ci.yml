@@ -433,12 +433,16 @@ jobs:
           0008-boringssl-sigalgs.patch \
           0009-boringssl-zstd-cert-compression.patch \
           0010-boringssl-build-compat.patch \
+          0011-boringssl-ech-grease-payload-length.patch \
           boringssl-loongarch.patch \
           underscore-wildcards.patch \
           relax-cert-validation.patch; do
           echo "Applying $p"
           patch -p1 < "../../patches/$p"
         done
+    - name: Check BoringSSL pregenerated files
+      working-directory: btls-sys/deps/boringssl
+      run: go run ./util/pregenerate -check
     - name: Configure BoringSSL ASan build
       working-directory: btls-sys/deps/boringssl
       run: >-

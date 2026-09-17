@@ -18,12 +18,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ---
  include/openssl/ssl.h   |  7 +++
+ include/openssl/prefix_symbols.h | 2 ++
  ssl/extensions.cc       | 99 +++++++++++++++++++++++++++++++++++++++++
  ssl/handshake_client.cc |  2 +-
  ssl/internal.h          |  9 ++++
  ssl/ssl_lib.cc          | 14 ++++++
  ssl/ssl_test.cc         | 49 ++++++++++++++++++++
- 6 files changed, 179 insertions(+), 1 deletion(-)
+ 7 files changed, 181 insertions(+), 1 deletion(-)
 
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
 index f962a4d0b..b5c5993e7 100644
@@ -278,3 +279,23 @@ index dd350d6b5..7f35da040 100644
  TEST(SSLTest, HostMatching) {
    static const char kCertPEM[] = R"(
  -----BEGIN CERTIFICATE-----
+diff --git a/include/openssl/prefix_symbols.h b/include/openssl/prefix_symbols.h
+index 110fffc0d..6ca87a1bb 100644
+--- a/include/openssl/prefix_symbols.h
++++ b/include/openssl/prefix_symbols.h
+@@ -2033,6 +2033,7 @@
+ #pragma redefine_extname SSL_CTX_set_dos_protection_cb BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_dos_protection_cb)
+ #pragma redefine_extname SSL_CTX_set_early_data_enabled BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_early_data_enabled)
+ #pragma redefine_extname SSL_CTX_set_ex_data BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_ex_data)
++#pragma redefine_extname SSL_CTX_set_extension_order BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_extension_order)
+ #pragma redefine_extname SSL_CTX_set_false_start_allowed_without_alpn BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_false_start_allowed_without_alpn)
+ #pragma redefine_extname SSL_CTX_set_grease_enabled BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_grease_enabled)
+ #pragma redefine_extname SSL_CTX_set_grease_sigalgs_enabled BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_grease_sigalgs_enabled)
+@@ -5171,6 +5172,7 @@
+ #define SSL_CTX_set_dos_protection_cb BORINGSSL_ADD_PREFIX(SSL_CTX_set_dos_protection_cb)
+ #define SSL_CTX_set_early_data_enabled BORINGSSL_ADD_PREFIX(SSL_CTX_set_early_data_enabled)
+ #define SSL_CTX_set_ex_data BORINGSSL_ADD_PREFIX(SSL_CTX_set_ex_data)
++#define SSL_CTX_set_extension_order BORINGSSL_ADD_PREFIX(SSL_CTX_set_extension_order)
+ #define SSL_CTX_set_false_start_allowed_without_alpn BORINGSSL_ADD_PREFIX(SSL_CTX_set_false_start_allowed_without_alpn)
+ #define SSL_CTX_set_grease_enabled BORINGSSL_ADD_PREFIX(SSL_CTX_set_grease_enabled)
+ #define SSL_CTX_set_grease_sigalgs_enabled BORINGSSL_ADD_PREFIX(SSL_CTX_set_grease_sigalgs_enabled)

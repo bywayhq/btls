@@ -18,11 +18,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ---
  include/openssl/ssl.h   | 36 +++++++++++++++++++-
+ include/openssl/prefix_symbols.h | 8 ++++++++
  ssl/handshake_client.cc | 75 +++++++++++++++++++++++++----------------
  ssl/internal.h          | 23 +++++++++++++
  ssl/ssl_cipher.cc       | 74 ++++++++++++++++++++++++++++++++++++++++
  ssl/ssl_lib.cc          | 73 ++++++++++++++++++++++++++++++++++++++-
- 5 files changed, 250 insertions(+), 31 deletions(-)
+ 6 files changed, 258 insertions(+), 31 deletions(-)
 
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
 index 4e5016618..610b30552 100644
@@ -444,5 +445,73 @@ index 672e79bc5..63cc14985 100644
  void SSL_get0_signed_cert_timestamp_list(const SSL *ssl, const uint8_t **out,
                                           size_t *out_len) {
    SSL_SESSION *session = SSL_get_session(ssl);
+diff --git a/include/openssl/prefix_symbols.h b/include/openssl/prefix_symbols.h
+index 6abd63202..229537b71 100644
+--- a/include/openssl/prefix_symbols.h
++++ b/include/openssl/prefix_symbols.h
+@@ -2014,6 +2014,7 @@
+ #pragma redefine_extname SSL_CTX_set1_sigalgs_list BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set1_sigalgs_list)
+ #pragma redefine_extname SSL_CTX_set1_tls_channel_id BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set1_tls_channel_id)
+ #pragma redefine_extname SSL_CTX_set1_verify_cert_store BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set1_verify_cert_store)
++#pragma redefine_extname SSL_CTX_set_aes_hw_override BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_aes_hw_override)
+ #pragma redefine_extname SSL_CTX_set_allow_unknown_alpn_protos BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_allow_unknown_alpn_protos)
+ #pragma redefine_extname SSL_CTX_set_alpn_protos BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_alpn_protos)
+ #pragma redefine_extname SSL_CTX_set_alpn_select_cb BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_alpn_select_cb)
+@@ -2053,6 +2054,7 @@
+ #pragma redefine_extname SSL_CTX_set_ocsp_response BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_ocsp_response)
+ #pragma redefine_extname SSL_CTX_set_options BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_options)
+ #pragma redefine_extname SSL_CTX_set_permute_extensions BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_permute_extensions)
++#pragma redefine_extname SSL_CTX_set_preserve_tls13_cipher_list BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_preserve_tls13_cipher_list)
+ #pragma redefine_extname SSL_CTX_set_private_key_method BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_private_key_method)
+ #pragma redefine_extname SSL_CTX_set_psk_client_callback BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_psk_client_callback)
+ #pragma redefine_extname SSL_CTX_set_psk_server_callback BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_psk_server_callback)
+@@ -2367,6 +2369,7 @@
+ #pragma redefine_extname SSL_set1_verify_cert_store BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set1_verify_cert_store)
+ #pragma redefine_extname SSL_set_SSL_CTX BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_SSL_CTX)
+ #pragma redefine_extname SSL_set_accept_state BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_accept_state)
++#pragma redefine_extname SSL_set_aes_hw_override BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_aes_hw_override)
+ #pragma redefine_extname SSL_set_alpn_protos BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_alpn_protos)
+ #pragma redefine_extname SSL_set_alps_use_new_codepoint BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_alps_use_new_codepoint)
+ #pragma redefine_extname SSL_set_bio BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_bio)
+@@ -2396,6 +2399,7 @@
+ #pragma redefine_extname SSL_set_ocsp_response BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_ocsp_response)
+ #pragma redefine_extname SSL_set_options BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_options)
+ #pragma redefine_extname SSL_set_permute_extensions BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_permute_extensions)
++#pragma redefine_extname SSL_set_preserve_tls13_cipher_list BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_preserve_tls13_cipher_list)
+ #pragma redefine_extname SSL_set_private_key_method BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_private_key_method)
+ #pragma redefine_extname SSL_set_psk_client_callback BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_psk_client_callback)
+ #pragma redefine_extname SSL_set_psk_server_callback BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_psk_server_callback)
+@@ -5156,6 +5160,7 @@
+ #define SSL_CTX_set1_sigalgs_list BORINGSSL_ADD_PREFIX(SSL_CTX_set1_sigalgs_list)
+ #define SSL_CTX_set1_tls_channel_id BORINGSSL_ADD_PREFIX(SSL_CTX_set1_tls_channel_id)
+ #define SSL_CTX_set1_verify_cert_store BORINGSSL_ADD_PREFIX(SSL_CTX_set1_verify_cert_store)
++#define SSL_CTX_set_aes_hw_override BORINGSSL_ADD_PREFIX(SSL_CTX_set_aes_hw_override)
+ #define SSL_CTX_set_allow_unknown_alpn_protos BORINGSSL_ADD_PREFIX(SSL_CTX_set_allow_unknown_alpn_protos)
+ #define SSL_CTX_set_alpn_protos BORINGSSL_ADD_PREFIX(SSL_CTX_set_alpn_protos)
+ #define SSL_CTX_set_alpn_select_cb BORINGSSL_ADD_PREFIX(SSL_CTX_set_alpn_select_cb)
+@@ -5195,6 +5200,7 @@
+ #define SSL_CTX_set_ocsp_response BORINGSSL_ADD_PREFIX(SSL_CTX_set_ocsp_response)
+ #define SSL_CTX_set_options BORINGSSL_ADD_PREFIX(SSL_CTX_set_options)
+ #define SSL_CTX_set_permute_extensions BORINGSSL_ADD_PREFIX(SSL_CTX_set_permute_extensions)
++#define SSL_CTX_set_preserve_tls13_cipher_list BORINGSSL_ADD_PREFIX(SSL_CTX_set_preserve_tls13_cipher_list)
+ #define SSL_CTX_set_private_key_method BORINGSSL_ADD_PREFIX(SSL_CTX_set_private_key_method)
+ #define SSL_CTX_set_psk_client_callback BORINGSSL_ADD_PREFIX(SSL_CTX_set_psk_client_callback)
+ #define SSL_CTX_set_psk_server_callback BORINGSSL_ADD_PREFIX(SSL_CTX_set_psk_server_callback)
+@@ -5509,6 +5515,7 @@
+ #define SSL_set1_verify_cert_store BORINGSSL_ADD_PREFIX(SSL_set1_verify_cert_store)
+ #define SSL_set_SSL_CTX BORINGSSL_ADD_PREFIX(SSL_set_SSL_CTX)
+ #define SSL_set_accept_state BORINGSSL_ADD_PREFIX(SSL_set_accept_state)
++#define SSL_set_aes_hw_override BORINGSSL_ADD_PREFIX(SSL_set_aes_hw_override)
+ #define SSL_set_alpn_protos BORINGSSL_ADD_PREFIX(SSL_set_alpn_protos)
+ #define SSL_set_alps_use_new_codepoint BORINGSSL_ADD_PREFIX(SSL_set_alps_use_new_codepoint)
+ #define SSL_set_bio BORINGSSL_ADD_PREFIX(SSL_set_bio)
+@@ -5538,6 +5545,7 @@
+ #define SSL_set_ocsp_response BORINGSSL_ADD_PREFIX(SSL_set_ocsp_response)
+ #define SSL_set_options BORINGSSL_ADD_PREFIX(SSL_set_options)
+ #define SSL_set_permute_extensions BORINGSSL_ADD_PREFIX(SSL_set_permute_extensions)
++#define SSL_set_preserve_tls13_cipher_list BORINGSSL_ADD_PREFIX(SSL_set_preserve_tls13_cipher_list)
+ #define SSL_set_private_key_method BORINGSSL_ADD_PREFIX(SSL_set_private_key_method)
+ #define SSL_set_psk_client_callback BORINGSSL_ADD_PREFIX(SSL_set_psk_client_callback)
+ #define SSL_set_psk_server_callback BORINGSSL_ADD_PREFIX(SSL_set_psk_server_callback)
 -- 
 2.50.0

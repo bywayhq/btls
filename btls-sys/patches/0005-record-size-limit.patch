@@ -23,6 +23,7 @@ limitations under the License.
 
 ---
  include/openssl/ssl.h   |  15 ++
+ include/openssl/prefix_symbols.h | 4 +
  include/openssl/tls1.h  |   3 +
  ssl/extensions.cc       | 135 ++++++++++++++++
  ssl/handshake_client.cc |  18 +++
@@ -36,7 +37,7 @@ limitations under the License.
  ssl/tls13_server.cc     |  25 ++-
  ssl/tls_method.cc       |  15 ++
  ssl/tls_record.cc       |  53 +++++++
- 14 files changed, 709 insertions(+), 4 deletions(-)
+ 15 files changed, 713 insertions(+), 4 deletions(-)
 
 diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
 index b5c5993e7..034d7d6ff 100644
@@ -1026,5 +1027,41 @@ index f77d84bfa..1c6f34b6b 100644
  static size_t tls_seal_scatter_prefix_len(const SSLImpl *ssl, uint8_t type,
                                            size_t in_len) {
    size_t ret = SSL3_RT_HEADER_LENGTH;
+diff --git a/include/openssl/prefix_symbols.h b/include/openssl/prefix_symbols.h
+index 6ca87a1bb..9e54191cb 100644
+--- a/include/openssl/prefix_symbols.h
++++ b/include/openssl/prefix_symbols.h
+@@ -2060,6 +2060,7 @@
+ #pragma redefine_extname SSL_CTX_set_quiet_shutdown BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_quiet_shutdown)
+ #pragma redefine_extname SSL_CTX_set_read_ahead BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_read_ahead)
+ #pragma redefine_extname SSL_CTX_set_record_protocol_version BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_record_protocol_version)
++#pragma redefine_extname SSL_CTX_set_record_size_limit BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_record_size_limit)
+ #pragma redefine_extname SSL_CTX_set_resumption_across_names_enabled BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_resumption_across_names_enabled)
+ #pragma redefine_extname SSL_CTX_set_retain_only_sha256_of_client_certs BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_retain_only_sha256_of_client_certs)
+ #pragma redefine_extname SSL_CTX_set_reverify_on_resume BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_CTX_set_reverify_on_resume)
+@@ -2404,6 +2405,7 @@
+ #pragma redefine_extname SSL_set_quic_use_legacy_codepoint BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_quic_use_legacy_codepoint)
+ #pragma redefine_extname SSL_set_quiet_shutdown BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_quiet_shutdown)
+ #pragma redefine_extname SSL_set_read_ahead BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_read_ahead)
++#pragma redefine_extname SSL_set_record_size_limit BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_record_size_limit)
+ #pragma redefine_extname SSL_set_renegotiate_mode BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_renegotiate_mode)
+ #pragma redefine_extname SSL_set_resumption_across_names_enabled BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_resumption_across_names_enabled)
+ #pragma redefine_extname SSL_set_retain_only_sha256_of_client_certs BORINGSSL_ADD_USER_LABEL_AND_PREFIX(SSL_set_retain_only_sha256_of_client_certs)
+@@ -5199,6 +5201,7 @@
+ #define SSL_CTX_set_quiet_shutdown BORINGSSL_ADD_PREFIX(SSL_CTX_set_quiet_shutdown)
+ #define SSL_CTX_set_read_ahead BORINGSSL_ADD_PREFIX(SSL_CTX_set_read_ahead)
+ #define SSL_CTX_set_record_protocol_version BORINGSSL_ADD_PREFIX(SSL_CTX_set_record_protocol_version)
++#define SSL_CTX_set_record_size_limit BORINGSSL_ADD_PREFIX(SSL_CTX_set_record_size_limit)
+ #define SSL_CTX_set_resumption_across_names_enabled BORINGSSL_ADD_PREFIX(SSL_CTX_set_resumption_across_names_enabled)
+ #define SSL_CTX_set_retain_only_sha256_of_client_certs BORINGSSL_ADD_PREFIX(SSL_CTX_set_retain_only_sha256_of_client_certs)
+ #define SSL_CTX_set_reverify_on_resume BORINGSSL_ADD_PREFIX(SSL_CTX_set_reverify_on_resume)
+@@ -5543,6 +5546,7 @@
+ #define SSL_set_quic_use_legacy_codepoint BORINGSSL_ADD_PREFIX(SSL_set_quic_use_legacy_codepoint)
+ #define SSL_set_quiet_shutdown BORINGSSL_ADD_PREFIX(SSL_set_quiet_shutdown)
+ #define SSL_set_read_ahead BORINGSSL_ADD_PREFIX(SSL_set_read_ahead)
++#define SSL_set_record_size_limit BORINGSSL_ADD_PREFIX(SSL_set_record_size_limit)
+ #define SSL_set_renegotiate_mode BORINGSSL_ADD_PREFIX(SSL_set_renegotiate_mode)
+ #define SSL_set_resumption_across_names_enabled BORINGSSL_ADD_PREFIX(SSL_set_resumption_across_names_enabled)
+ #define SSL_set_retain_only_sha256_of_client_certs BORINGSSL_ADD_PREFIX(SSL_set_retain_only_sha256_of_client_certs)
 -- 
 2.50.0

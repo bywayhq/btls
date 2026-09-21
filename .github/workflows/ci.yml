@@ -434,6 +434,7 @@ jobs:
           0009-boringssl-zstd-cert-compression.patch \
           0010-boringssl-build-compat.patch \
           0011-boringssl-ech-grease-payload-length.patch \
+          0012-boringssl-ech-grease-aead.patch \
           boringssl-loongarch.patch \
           underscore-wildcards.patch \
           relax-cert-validation.patch; do

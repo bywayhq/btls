@@ -26,8 +26,12 @@ fn compiler_launcher() -> Option<OsString> {
         return Some(launcher);
     }
 
+    // The Rust wrappers are read without a rerun trigger. A launcher changes
+    // how the C/C++ compiler is invoked, not what it produces, so a changed
+    // wrapper never makes the built libraries stale. `cargo clippy` sets
+    // RUSTC_WORKSPACE_WRAPPER and other Cargo commands do not; a trigger on it
+    // rebuilt BoringSSL whenever a target directory alternated between them.
     for var in ["RUSTC_WRAPPER", "RUSTC_WORKSPACE_WRAPPER"] {
-        println!("cargo:rerun-if-env-changed={var}");
         let Some(wrapper) = std::env::var_os(var).filter(|v| !v.is_empty()) else {
             continue;
         };

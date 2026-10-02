@@ -2105,7 +2105,9 @@ impl SslContextBuilder {
     /// Sets the maximum protected TLS record plaintext this endpoint accepts.
     ///
     /// A value of `0` disables [RFC 8449]. Other values must be in
-    /// `64..=16385`. DTLS, QUIC, and handoff connections are not supported.
+    /// `64..=16385`. DTLS and handoff connections are not supported. A QUIC
+    /// connection negotiates the extension, but QUIC does not use TLS records,
+    /// so no limit applies to it and its early data is unaffected.
     ///
     /// A TLS 1.3 client sends early data before it learns the server's
     /// limit, so records in the whole 0-RTT epoch may use the protocol

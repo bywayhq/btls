@@ -435,6 +435,7 @@ jobs:
           0010-boringssl-build-compat.patch \
           0011-boringssl-ech-grease-payload-length.patch \
           0012-boringssl-ech-grease-aead.patch \
+          0013-boringssl-record-size-limit-early-data.patch \
           boringssl-loongarch.patch \
           underscore-wildcards.patch \
           relax-cert-validation.patch; do

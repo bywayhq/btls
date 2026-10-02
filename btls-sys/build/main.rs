@@ -854,6 +854,11 @@ fn generate_bindings(config: &Config) -> Result<PathBuf, Box<dyn std::error::Err
         .merge_extern_blocks(true)
         .prepend_enum_name(true)
         .blocklist_type("max_align_t") // Not supported by bindgen on all targets, not used by BoringSSL
+        // The C library's allocator, declared by system headers BoringSSL
+        // includes. Rust 1.99 denies a binding whose signature differs from
+        // the standard library's (`suspicious_runtime_symbol_definitions`),
+        // and nothing here calls the C allocator directly.
+        .blocklist_function("^(malloc|calloc|realloc|free)$")
         .clang_args(get_extra_clang_args_for_bindgen(config))
         .clang_arg("-I")
         .clang_arg(include_path.display().to_string());

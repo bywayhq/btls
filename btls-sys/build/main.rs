@@ -539,6 +539,7 @@ fn ensure_patches_applied(config: &Config) -> io::Result<()> {
             "0011-boringssl-ech-grease-payload-length.patch",
             "0012-boringssl-ech-grease-aead.patch",
             "0013-boringssl-record-size-limit-early-data.patch",
+            "0014-boringssl-extension-order-tail.patch",
         ] {
             println!("cargo:warning=applying {patch_name} to boringssl");
             apply_patch(config, patch_name)?;

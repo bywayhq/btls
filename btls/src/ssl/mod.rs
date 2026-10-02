@@ -2178,7 +2178,9 @@ impl SslContextBuilder {
     /// Sets the ClientHello extension order.
     ///
     /// Known extensions stay in the configured order. Unlisted extensions are
-    /// appended in random order.
+    /// appended in random order, before any tail set by
+    /// [`Self::set_extension_order_tail`]. A type that the tail also lists is
+    /// rejected.
     #[cfg(not(feature = "fips"))]
     #[corresponds(SSL_CTX_set_extension_order)]
     pub fn set_extension_permutation(
@@ -2199,6 +2201,35 @@ impl SslContextBuilder {
     #[corresponds(SSL_CTX_set_permute_extensions)]
     pub fn set_permute_extensions(&mut self, enabled: bool) {
         unsafe { ffi::SSL_CTX_set_permute_extensions(self.as_ptr(), enabled as _) }
+    }
+
+    /// Sets ClientHello extensions that are written after all others, in the
+    /// given order.
+    ///
+    /// Only `padding` and `pre_shared_key` follow them. With GREASE enabled,
+    /// the trailing GREASE extension precedes them. The extensions between the
+    /// order set by [`Self::set_extension_permutation`] and this tail are
+    /// shuffled when that order is set or [`Self::set_permute_extensions`] is
+    /// enabled, and keep BoringSSL's default order otherwise. The second
+    /// ClientHello after a HelloRetryRequest keeps the order.
+    ///
+    /// Unknown and repeated types are ignored, and a listed extension is
+    /// written only when the connection sends it anyway. An empty list clears
+    /// the tail. A type that [`Self::set_extension_permutation`] also lists is
+    /// rejected and leaves the previous tail in place.
+    #[cfg(not(feature = "fips"))]
+    #[corresponds(SSL_CTX_set_extension_order_tail)]
+    pub fn set_extension_order_tail(
+        &mut self,
+        extensions: &[ExtensionType],
+    ) -> Result<(), ErrorStack> {
+        unsafe {
+            cvt(ffi::SSL_CTX_set_extension_order_tail(
+                self.as_ptr(),
+                extensions.as_ptr() as *const _,
+                extensions.len(),
+            ))
+        }
     }
 
     /// Sets the context's supported signature verification algorithms.

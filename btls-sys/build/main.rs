@@ -541,6 +541,7 @@ fn ensure_patches_applied(config: &Config) -> io::Result<()> {
             "0013-boringssl-record-size-limit-early-data.patch",
             "0014-boringssl-extension-order-tail.patch",
             "0015-boringssl-quic-record-size-limit.patch",
+            "0016-boringssl-tls13-legacy-extensions.patch",
         ] {
             println!("cargo:warning=applying {patch_name} to boringssl");
             apply_patch(config, patch_name)?;

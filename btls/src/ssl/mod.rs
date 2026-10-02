@@ -2205,6 +2205,22 @@ impl SslContextBuilder {
         unsafe { ffi::SSL_CTX_set_permute_extensions(self.as_ptr(), enabled as _) }
     }
 
+    /// Sets whether a client whose minimum version is TLS 1.3 still sends the
+    /// `extended_master_secret` and `renegotiation_info` extensions, as NSS
+    /// does.
+    ///
+    /// Both only affect TLS 1.2 and earlier, and are omitted from such a
+    /// ClientHello by default. ClientHelloInner never carries them, and
+    /// [`SslOptions::NO_RENEGOTIATION`] still omits `renegotiation_info`. This
+    /// applies to TLS and QUIC.
+    #[cfg(not(feature = "fips"))]
+    #[corresponds(SSL_CTX_set_tls12_extensions_in_tls13_client_hello)]
+    pub fn set_tls12_extensions_in_tls13_client_hello(&mut self, enabled: bool) {
+        unsafe {
+            ffi::SSL_CTX_set_tls12_extensions_in_tls13_client_hello(self.as_ptr(), enabled as _)
+        }
+    }
+
     /// Sets ClientHello extensions that are written after all others, in the
     /// given order.
     ///
@@ -3392,6 +3408,14 @@ impl SslRef {
     #[corresponds(SSL_set_permute_extensions)]
     pub fn set_permute_extensions(&mut self, enabled: bool) {
         unsafe { ffi::SSL_set_permute_extensions(self.as_ptr(), enabled as _) }
+    }
+
+    /// Like [`SslContextBuilder::set_tls12_extensions_in_tls13_client_hello`],
+    /// but for this connection only.
+    #[cfg(not(feature = "fips"))]
+    #[corresponds(SSL_set_tls12_extensions_in_tls13_client_hello)]
+    pub fn set_tls12_extensions_in_tls13_client_hello(&mut self, enabled: bool) {
+        unsafe { ffi::SSL_set_tls12_extensions_in_tls13_client_hello(self.as_ptr(), enabled as _) }
     }
 
     /// Like [`SslContextBuilder::set_record_size_limit`], but for this

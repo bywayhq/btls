@@ -611,6 +611,63 @@ fn boringssl_patch_extension_order_tail_rejects_prefix_overlap() {
 }
 
 #[test]
+fn boringssl_patch_tls13_client_hello_can_send_tls12_extensions() {
+    // 0016-boringssl-tls13-legacy-extensions.patch lets a TLS 1.3-only client
+    // send extended_master_secret and renegotiation_info, as NSS does.
+    for (context_enabled, connection_enabled, expected) in [
+        (false, None, false),
+        (true, None, true),
+        (true, Some(false), false),
+        (false, Some(true), true),
+    ] {
+        let observed = Arc::new(Mutex::new(None));
+        let mut server = Server::builder();
+        server.ctx().set_select_certificate_callback({
+            let observed = Arc::clone(&observed);
+            move |client_hello| {
+                *observed.lock().unwrap() = Some((
+                    client_hello
+                        .get_extension(ExtensionType::EXTENDED_MASTER_SECRET)
+                        .map(ToOwned::to_owned),
+                    client_hello
+                        .get_extension(ExtensionType::RENEGOTIATE)
+                        .map(ToOwned::to_owned),
+                ));
+                Ok(())
+            }
+        });
+        let server = server.build();
+
+        let mut client = server.client_with_root_ca();
+        client
+            .ctx()
+            .set_min_proto_version(Some(SslVersion::TLS1_3))
+            .unwrap();
+        client
+            .ctx()
+            .set_tls12_extensions_in_tls13_client_hello(context_enabled);
+        let client = client.build();
+        let mut ssl = client.builder();
+        if let Some(enabled) = connection_enabled {
+            ssl.ssl()
+                .set_tls12_extensions_in_tls13_client_hello(enabled);
+        }
+        let stream = ssl.connect();
+        assert_eq!(stream.ssl().version2(), Some(SslVersion::TLS1_3));
+        drop(server);
+
+        let (ems, ri) = observed.lock().unwrap().take().unwrap();
+        if expected {
+            assert_eq!(ems.as_deref(), Some(&[][..]));
+            assert_eq!(ri.as_deref(), Some(&[0][..]));
+        } else {
+            assert_eq!(ems, None);
+            assert_eq!(ri, None);
+        }
+    }
+}
+
+#[test]
 fn boringssl_patch_allows_duplicate_signature_algorithms() {
     let signature_algorithms = Arc::new(Mutex::new(None));
 
